@@ -14,9 +14,9 @@ const END_DATE = process.env.END_DATE;
 const END_DATE_VALUE = process.env.END_DATE_VALUE;
 const API_KEY_VALUE = process.env.API_KEY_VALUE;
 
-
+//request to all NASA meteors and simplify filter
 router.get("/", async (req, res) => {
-
+    console.log(req.query.keyword)
     try {
         const params = new URLSearchParams({
             [API_KEY_NAME]: API_KEY_VALUE,
@@ -42,7 +42,7 @@ router.get("/", async (req, res) => {
         }, {});
         console.log(filteredData);
 
-        res.status(200).send(data);
+        res.status(200).send(filteredData);
     } catch (e) {
         res.status(500).json(e)
     }
