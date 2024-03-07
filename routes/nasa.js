@@ -6,13 +6,13 @@ const router = express.Router();
 const needle = require('needle');
 
 //Env vars
-const API_BASE_URL = "https://api.nasa.gov/neo/rest/v1/feed";
-const API_KEY_NAME = "api_key";
-const START_DATE = "start_date";
-const START_DATE_VALUE = '2015-09-07';
-const END_DATE = "end_date";
-const END_DATE_VALUE = "2015-09-08";
-const API_KEY_VALUE = "cSZhruTYTjIDDmpTmvbfozr6eVmc7rz7wncZwUQ0";
+const API_BASE_URL = process.env.API_BASE_URL;
+const API_KEY_NAME = process.env.API_KEY_NAME;
+const START_DATE = process.env.START_DATE;
+const START_DATE_VALUE = process.env.START_DATE_VALUE;
+const END_DATE = process.env.END_DATE;
+const END_DATE_VALUE = process.env.END_DATE_VALUE;
+const API_KEY_VALUE = process.env.API_KEY_VALUE;
 
 
 router.get("/", async (req, res) => {
