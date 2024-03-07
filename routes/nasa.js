@@ -13,15 +13,32 @@ const API_KEY_VALUE = "cSZhruTYTjIDDmpTmvbfozr6eVmc7rz7wncZwUQ0";
 
 router.get("/", async (req, res) => {
 
-    try{
+    try {
         const params = new URLSearchParams({
-            [API_KEY_NAME]:API_KEY_VALUE
+            [API_KEY_NAME]: API_KEY_VALUE
         });
-        console.log(`${API_BASE_URL}?${params}`);
         const apiRes = await needle('get', `${API_BASE_URL}?${params}`);
-        const data = apiRes.body;
+        const data = apiRes.body.near_earth_objects;
 
-        res.status(200).json(data)
+        const filteredData = Object.keys(data).reduce((acc, key) => {
+            acc[key] = data[key].map(object => {
+                return {
+                    id: object.id,
+                    estimated_diameter_meters: object.estimated_diameter.meters,
+                    is_potentially_hazardous_asteroid: object.is_potentially_hazardous_asteroid,
+                    close_approach_date_full: object.close_approach_data
+                        .map(el => el.close_approach_date_full)
+                        .join(''),
+                    relative_velocity_kilometers_per_second: object.close_approach_data
+                        .map(el => el.relative_velocity.kilometers_per_second)
+                        .join('')
+                }
+            });
+            return acc
+        }, {});
+        console.log(filteredData);
+
+        res.status(200).send(data);
     } catch (e) {
         res.status(500).json(e)
     }

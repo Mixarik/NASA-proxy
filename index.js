@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 
 //Routes
-app.use('/nasa',require('./routes/nasa'));
+app.use('/near-earth-objects',require('./routes/nasa'));
 
 app.listen(PORT, function (error) {
 
