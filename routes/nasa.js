@@ -16,7 +16,6 @@ const API_KEY_VALUE = process.env.API_KEY_VALUE;
 
 //request to all NASA meteors and simplify filter
 router.get("/", async (req, res) => {
-    console.log(req.query.keyword)
     try {
         const params = new URLSearchParams({
             [API_KEY_NAME]: API_KEY_VALUE,
