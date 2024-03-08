@@ -23,12 +23,12 @@ router.get("/meteors", async (req, res) => {
     try {
         const params = new URLSearchParams({});
 
-        queryParams.hasOwnProperty(START_DATE) && params.append([START_DATE], queryParams[START_DATE]);
-        queryParams.hasOwnProperty(END_DATE) && params.append([END_DATE], queryParams[END_DATE]);
-        queryParams.hasOwnProperty(API_KEY_NAME) && params.append([API_KEY_NAME], queryParams[API_KEY_NAME]);
+        queryParams.hasOwnProperty(START_DATE) && params.append(START_DATE, queryParams[START_DATE]);
+        queryParams.hasOwnProperty(END_DATE) && params.append(END_DATE, queryParams[END_DATE]);
+        queryParams.hasOwnProperty(API_KEY_NAME) && params.append(API_KEY_NAME, queryParams[API_KEY_NAME]);
 
         const apiRes = await needle('get', `${API_BASE_URL}?${params}`);
-        const data = apiRes.body.near_earth_objects;
+        const data = apiRes?.body?.near_earth_objects;
 
         const simplifyStructureMeteor = (object) => {
             return {
@@ -43,31 +43,32 @@ router.get("/meteors", async (req, res) => {
         };
 
         const filteredData = Object.keys(data).reduce((acc, key) => {
-            const meteorQueryParams = data[key].filter(object => {
-                if (queryParams.hasOwnProperty(WERE_DANGEROUS_METEORS) && queryParams[WERE_DANGEROUS_METEORS] === 'true') {
-                    return object.is_potentially_hazardous_asteroid === true && simplifyStructureMeteor(object);
-                }
+            const meteorsArray = data[key].filter(currMeteor => {
+                if (queryParams.hasOwnProperty(WERE_DANGEROUS_METEORS)) {
+                    if (queryParams[WERE_DANGEROUS_METEORS] === 'true' && currMeteor.is_potentially_hazardous_asteroid) {
+                        return simplifyStructureMeteor(currMeteor)
+                    }
 
-                if (queryParams.hasOwnProperty(WERE_DANGEROUS_METEORS) && queryParams[WERE_DANGEROUS_METEORS] === 'false') {
-                    return object.is_potentially_hazardous_asteroid === false && simplifyStructureMeteor(object)
-                }
+                    if (queryParams[WERE_DANGEROUS_METEORS] === 'false' && !currMeteor.is_potentially_hazardous_asteroid) {
+                        return simplifyStructureMeteor(currMeteor)
+                    }
 
-                if (!queryParams.hasOwnProperty(WERE_DANGEROUS_METEORS)) {
-                    return simplifyStructureMeteor(object)
+                } else {
+                    return simplifyStructureMeteor(currMeteor)
                 }
             });
 
-            if (meteorQueryParams.length) acc[key] = meteorQueryParams;
-
+            if (meteorsArray.length) {
+                acc[key] = meteorsArray
+            }
 
             return acc
         }, {});
 
-        res.status(200).send({filteredData});
+        res.status(200).send(filteredData);
     } catch (e) {
         res.status(500).json(e)
     }
-
 });
 
 router.post('/rover', async (req, res) => {
